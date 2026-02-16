@@ -49,13 +49,35 @@
             
         }
 
-        // Shuffle
+        // Shuffle question
         function Shuffle(array){
-            for ( let i =array.length; i >0 ; x--){
+            for ( let i =array.length-1; i >0 ; i--){
                 const j = Math.floor(Math.random()*(i+1));
                 [array[i],array[j]] = [array[j],array[i]];
             }      
         }
+
+        // Shuffle option
+        function Shuffleoptions(q) {
+            const combine = q.options.map( opt => 
+            ({text:opt, isCorrect : Array.isArray(q.correct)? q.correct.includes(opt):q.correct === opt}))};
+
+            for (let i = combine.length - 1;i>0 ;i-- ){
+                const j = Math.floor(Math.random()*(i+1));
+                [array[i],array[j]]=[array[j],array[j]]
+            }
+
+
+            q.options = combine.map(item => item.text);
+            if (Array.isArray(q.correct)) {
+                q.correct = combined.filter(item => item.isCorrect).map(item=>item.text);}
+                else {
+                    q.correct = combined.find(item =>item.isCorrect)?.text 
+                }
+
+
+
+
 
 
     </script>
