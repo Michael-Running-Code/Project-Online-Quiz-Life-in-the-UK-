@@ -37,8 +37,27 @@
     <button id="backBtn" style='display:none'>Back</button>
     <button id="nextBtn" style="display:none">Next</button>
 
+    <script src="question.js"></script>
     <script>
-        
+        let current = 0;
+        let answers = [];
+        let timeLeft = 45*60;
+        let timerInterval;
+
+        // Start 
+        function start(){
+            
+        }
+
+        // Shuffle
+        function Shuffle(array){
+            for ( let i =array.length; i >0 ; x--){
+                const j = Math.floor(Math.random()*(i+1));
+                [array[i],array[j]] = [array[j],array[i]];
+            }      
+        }
+
+
     </script>
     
 </body>
