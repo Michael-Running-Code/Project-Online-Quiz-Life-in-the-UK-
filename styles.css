@@ -4,10 +4,11 @@ body {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    background: #f8f9fa;
+    background: #0066cc;
+    color: white;
 }
 h1 { 
-    color: blue;
+    color: white;;
     margin-bottom: 20px;
 }
 button { 
@@ -46,7 +47,7 @@ ul li {
 
 
 button {
-  background: #0066cc;
+  background: #ff0000;
   color: white;
   border: none;
   padding: 14px 32px;
@@ -57,7 +58,7 @@ button {
 }
 
 button:hover {
-  background: #0052a3;
+  background: #cc0000;
 }
 
 .container {
