@@ -74,6 +74,32 @@
                 else {
                     q.correct = combined.find(item =>item.isCorrect)?.text 
                 }
+        // Show question
+        function showQuestion(i) {
+            const q = questions[i];
+            let html = `<div class="question">
+                <h3>Question ${i+1} of 24 </h3>
+                <p>${q.question}</p>`
+
+            if (q.type === "multiple") {
+                html += '<p><small>(select all that apply)<small><p>'
+            }
+
+            q.options.forEach((opt,idx) => {
+                const type = q.type === "multiple" ? "checkbox" :"radio";
+                html += `<label>
+                    <input type="${type}" name="ans" value="${idx}">
+                    ${opt}
+                    </label>`;
+            });
+
+            html +=`</div>`;
+
+            document.getElementById('quiz').innerHTML = html;
+
+            
+
+        }
 
 
 
