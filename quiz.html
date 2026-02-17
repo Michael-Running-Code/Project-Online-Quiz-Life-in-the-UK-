@@ -153,8 +153,8 @@
         function showQuestion(i) {
             const q = questions[i];
             let html = `<div class="question">
-    <h3>Question ${i + 1} of ${questions.length}</h3>
-    <p>${q.question}</p>`;
+                <h3>Question ${i + 1} of ${questions.length}</h3>
+                <p>${q.question}</p>`;
 
             if (q.type === "multiple") {
                 html += '<p><small>(select all that apply)</small></p>';
@@ -163,9 +163,8 @@
             q.options.forEach((opt, idx) => {
                 const type = q.type === "multiple" ? "checkbox" : "radio";
                 html += `<label>
-      <input type="${type}" name="ans" value="${idx}">
-      ${opt}
-    </label>`;
+                    <input type="${type}" name="ans" value="${idx}">
+                    ${opt}</label>`;
             });
 
             html += `</div>`;
@@ -183,22 +182,36 @@
 
             document.getElementById("backBtn").style.display = current === 0 ? "none" : "inline-block";
             document.getElementById("nextBtn").textContent = current === questions.length - 1 ? "Submit" : "Next";
+            updateProgressBlocks();
         }
 
         function checkAndNext() {
             const selected = [...document.querySelectorAll('input[name="ans"]:checked')]
                 .map(el => parseInt(el.value));
 
-
             answers[current] = selected;
 
             if (current === questions.length - 1) {
-                showResult();
+                // Check if all questions answered
+                const unanswered = answers.reduce((count, ans, i) => {
+                    return count + (ans && ans.length > 0 ? 0 : 1);
+                }, 0);
+
+                if (unanswered > 0) {
+                    if (confirm(`You haven't answered all question(s). Are you sure to submit?`)) {
+                        showResult();
+                    }
+                } else {
+                    if (confirm("Are you sure to submit?")) {
+                        showResult();
+                    }
+                }
                 return;
             }
 
             current++;
             showQuestion(current);
+            updateProgressBlocks();
         }
 
         function goBack() {
@@ -206,6 +219,7 @@
                 current--;
                 showQuestion(current);
             }
+            updateProgressBlocks();
         }
 
         // showResult, startTimer remain the same (fix typos: percent, PASS/Fail)
@@ -273,6 +287,7 @@
                 current = index;
                 showQuestion(current);
             }
+            updateProgressBlocks();
         }
         start();
 
