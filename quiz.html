@@ -28,6 +28,30 @@
             font-size: 1.3em;
             margin: 40px 0;
         }
+
+        label {
+            display: block;
+            margin: 8px 0;
+        }
+
+        .quiz-container {
+            width: 700px;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+            /* 👈 important */
+        }
+
+        #questionArea {
+            max-height: 300px;
+        }
+
+        .button-area {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+        }
     </style>
 </head>
 
@@ -36,8 +60,14 @@
     <div id="timer" style="font-size:20px; font-weight:bold; margin-bottom:20px;">
         Time Remaining: 45:00</div>
     <div id="quiz"></div>
-    <button id="backBtn" style='display:none'>Back</button>
-    <button id="nextBtn" style="display:none">Next</button>
+    <div class="quiz-container">
+        <div id="questionArea"></div>
+
+        <div class="button-area">
+            <button id="backBtn">Back</button>
+            <button id="nextBtn">Next</button>
+        </div>
+    </div>
 
     <script src="question.js"></script>
     <script>
@@ -117,10 +147,6 @@
             const selected = [...document.querySelectorAll('input[name="ans"]:checked')]
                 .map(el => parseInt(el.value));
 
-            if (selected.length === 0 && questions[current].type !== "multiple") {
-                alert("Please select an answer");
-                return;
-            }
 
             answers[current] = selected;
 
@@ -146,6 +172,24 @@
         document.getElementById("backBtn").onclick = goBack;
 
         start();
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+
+                document.getElementById("timer").textContent =
+                    `Time Remaining: ${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    showResult();  // auto submit when time ends
+                }
+            }, 1000);
+        }
+
     </script>
 
 </body>

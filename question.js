@@ -1,4 +1,4 @@
-    const questions = [{
+    window.questions = [{
       "question": "Who were the first people to arrive in Britain in what we call the Stone Age?",
       "options": ["Farmers", "Hunter-gatherers", "Warriors", "Pirates"],
       "correct": "Hunter-gatherers",
