@@ -108,6 +108,24 @@
 
         }
 
+        function checkAndNext() {
+            const selected = [...document.querySelectorAll('input[name="ans"]:checked')].map(el => parseInt(el.value));
+        
+
+            answers[current]=selected;
+
+            if (current === questions.length-1) {
+                showResult();
+                return;
+            }
+
+            current++;
+            showQuestion(current);
+
+        }
+
+
+
 
 
 
