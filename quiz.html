@@ -45,12 +45,51 @@
 
         #questionArea {
             max-height: 300px;
+            overflow: auto;
         }
 
         .button-area {
             display: flex;
             justify-content: space-between;
             padding-top: 20px;
+        }
+
+        #progress-blocks {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+            max-width: 700px;
+        }
+
+        .block {
+            width: 36px;
+            height: 36px;
+            line-height: 36px;
+            text-align: center;
+            background: #ccc;
+            color: #333;
+            border: 2px solid #999;
+            /* border added */
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .block.answered {
+            background: #4CAF50;
+            color: white;
+            border-color: #388E3C;
+            /* darker green border */
+        }
+
+        .block.current {
+            background: #ff9800;
+            color: white;
+            border-color: #f57c00;
+            /* darker orange border */
+            transform: scale(1.15);
         }
     </style>
 </head>
@@ -59,6 +98,7 @@
     <h1>Life in the UK Quiz</h1>
     <div id="timer" style="font-size:20px; font-weight:bold; margin-bottom:20px;">
         Time Remaining: 45:00</div>
+    <div id="progress-blocks"></div>
     <div id="quiz"></div>
     <div class="quiz-container">
         <div id="questionArea"></div>
@@ -103,8 +143,10 @@
         function start() {
             shuffle(questions);
             questions.forEach(shuffleOptions);
+            createProgressBlocks();
             startTimer();
             showQuestion(current);
+            document.getElementById("backBtn").style.display = "none";
             document.getElementById("nextBtn").style.display = "inline-block";
         }
 
@@ -128,7 +170,7 @@
 
             html += `</div>`;
 
-            document.getElementById("quiz").innerHTML = html;
+            document.getElementById("questionArea").innerHTML = html;
 
             // restore answers
             if (answers[i]) {
@@ -170,7 +212,68 @@
 
         document.getElementById("nextBtn").onclick = checkAndNext;
         document.getElementById("backBtn").onclick = goBack;
+        function showResult() {
+            let score = 0;
+            questions.forEach((q, i) => {
+                const selected = answers[i] || [];
+                const correctIndices = Array.isArray(q.correct)
+                    ? q.correct.map(opt => q.options.indexOf(opt))
+                    : [q.options.indexOf(q.correct)];
 
+                const isCorrect = selected.length === correctIndices.length &&
+                    selected.every(v => correctIndices.includes(v));
+                if (isCorrect) score++;
+            });
+
+            const percent = Math.round((score / questions.length) * 100);
+            const pass = score >= 18;
+
+            document.getElementById("questionArea").innerHTML = `
+    <div class="result">
+      <h2>Score: ${score} / ${questions.length} (${percent}%)</h2>
+      <p style="color: ${pass ? 'green' : 'red'}; font-weight:bold;">
+        ${pass ? "PASS" : "FAIL"}
+      </p>
+      <button onclick="location.reload()">Restart Quiz</button>
+    </div>`;
+
+            document.getElementById("backBtn").style.display = "none";
+            document.getElementById("nextBtn").style.display = "none";
+            clearInterval(timerInterval);
+        }
+
+        function createProgressBlocks() {
+            const container = document.getElementById("progress-blocks");
+            container.innerHTML = "";
+            for (let i = 1; i <= questions.length; i++) {
+                const block = document.createElement("div");
+                block.className = "block";
+                block.textContent = i;
+                block.dataset.num = i;
+                block.onclick = () => jumpToQuestion(i - 1);
+                container.appendChild(block);
+            }
+        }
+
+        function updateProgressBlocks() {
+            document.querySelectorAll(".block").forEach(block => {
+                const qNum = parseInt(block.dataset.num) - 1;
+                block.classList.remove("current");
+                if (qNum === current) {
+                    block.classList.add("current");
+                }
+                if (answers[qNum] && answers[qNum].length > 0) {
+                    block.classList.add("answered");
+                }
+            });
+        }
+
+        function jumpToQuestion(index) {
+            if (index >= 0 && index < questions.length) {
+                current = index;
+                showQuestion(current);
+            }
+        }
         start();
 
         function startTimer() {
