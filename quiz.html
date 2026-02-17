@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
-<title>Life in the UK - Simple Quiz</title>
-<style>
-    body {
-        font-family: Arial;
-        max-width: 700px;
-        margin: 30px auto;
-    }
+    <title>Life in the UK - Simple Quiz</title>
+    <style>
+        body {
+            font-family: Arial;
+            max-width: 700px;
+            margin: 30px auto;
+        }
 
-    .question {
-        margin: 30px 0;
-    }
+        .question {
+            margin: 30px 0;
+        }
 
-    button {
-        padding: 12px 30px;
-        background: #0066cc;
-        color: white;
-        border: none;
-        border-radius: 6px;
-    }
+        button {
+            padding: 12px 30px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
 
-    .result {
-        text-align: center;
-        font-size: 1.3em;
-        margin: 40px 0;
-    }
-</style>
+        .result {
+            text-align: center;
+            font-size: 1.3em;
+            margin: 40px 0;
+        }
+    </style>
 </head>
+
 <body>
     <h1>Life in the UK Quiz</h1>
-    <div id = "timer" style="font-size:20px; font-weight:bold; margin-bottom:20px;">
+    <div id="timer" style="font-size:20px; font-weight:bold; margin-bottom:20px;">
         Time Remaining: 45:00</div>
     <div id="quiz"></div>
     <button id="backBtn" style='display:none'>Back</button>
@@ -39,100 +41,113 @@
 
     <script src="question.js"></script>
     <script>
+
         let current = 0;
         let answers = [];
-        let timeLeft = 45*60;
+        let timeLeft = 45 * 60;
         let timerInterval;
 
-        // Start 
-        function start(){
-            
-        }
-
-        // Shuffle question
-        function Shuffle(array){
-            for ( let i =array.length-1; i >0 ; i--){
-                const j = Math.floor(Math.random()*(i+1));
-                [array[i],array[j]] = [array[j],array[i]];
-            }      
-        }
-
-        // Shuffle option
-        function Shuffleoptions(q) {
-            const combine = q.options.map( opt => 
-            ({text:opt, isCorrect : Array.isArray(q.correct)? q.correct.includes(opt):q.correct === opt}))};
-
-            for (let i = combine.length - 1;i>0 ;i-- ){
-                const j = Math.floor(Math.random()*(i+1));
-                [array[i],array[j]]=[array[j],array[j]]
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
+        }
 
+        function shuffleOptions(q) {
+            let combined = q.options.map(opt => ({
+                text: opt,
+                isCorrect: Array.isArray(q.correct) ? q.correct.includes(opt) : q.correct === opt
+            }));
 
-            q.options = combine.map(item => item.text);
+            shuffle(combined);  // reuse the shuffle function
+
+            q.options = combined.map(item => item.text);
             if (Array.isArray(q.correct)) {
-                q.correct = combined.filter(item => item.isCorrect).map(item=>item.text);}
-                else {
-                    q.correct = combined.find(item =>item.isCorrect)?.text 
-                }
-        // Show question
+                q.correct = combined.filter(item => item.isCorrect).map(item => item.text);
+            } else {
+                q.correct = combined.find(item => item.isCorrect)?.text;
+            }
+        }
+
+        function start() {
+            shuffle(questions);
+            questions.forEach(shuffleOptions);
+            startTimer();
+            showQuestion(current);
+            document.getElementById("nextBtn").style.display = "inline-block";
+        }
+
         function showQuestion(i) {
             const q = questions[i];
             let html = `<div class="question">
-                <h3>Question ${i+1} of 24 </h3>
-                <p>${q.question}</p>`
+    <h3>Question ${i + 1} of ${questions.length}</h3>
+    <p>${q.question}</p>`;
 
             if (q.type === "multiple") {
-                html += '<p><small>(select all that apply)<small><p>'
+                html += '<p><small>(select all that apply)</small></p>';
             }
 
-            q.options.forEach((opt,idx) => {
-                const type = q.type === "multiple" ? "checkbox" :"radio";
+            q.options.forEach((opt, idx) => {
+                const type = q.type === "multiple" ? "checkbox" : "radio";
                 html += `<label>
-                    <input type="${type}" name="ans" value="${idx}">
-                    ${opt}
-                    </label>`;
+      <input type="${type}" name="ans" value="${idx}">
+      ${opt}
+    </label>`;
             });
 
-            html +=`</div>`;
+            html += `</div>`;
 
-            document.getElementById('quiz').innerHTML = html;
+            document.getElementById("quiz").innerHTML = html;
 
+            // restore answers
             if (answers[i]) {
                 document.querySelectorAll('input[name="ans"]').forEach(input => {
-                    if (answers[i].includes(parseInt(input.value))) input.chekced = true; 
+                    if (answers[i].includes(parseInt(input.value))) {
+                        input.checked = true;
+                    }
                 });
             }
 
-            document.getElementById('nextBtn').style.display = current === 0 ? "none" : "inline-block";
-            document.getElementById('backBtn').textContent = current === 23? "Submit" : "Next" ; 
-
+            document.getElementById("backBtn").style.display = current === 0 ? "none" : "inline-block";
+            document.getElementById("nextBtn").textContent = current === questions.length - 1 ? "Submit" : "Next";
         }
 
         function checkAndNext() {
-            const selected = [...document.querySelectorAll('input[name="ans"]:checked')].map(el => parseInt(el.value));
-        
+            const selected = [...document.querySelectorAll('input[name="ans"]:checked')]
+                .map(el => parseInt(el.value));
 
-            answers[current]=selected;
+            if (selected.length === 0 && questions[current].type !== "multiple") {
+                alert("Please select an answer");
+                return;
+            }
 
-            if (current === questions.length-1) {
+            answers[current] = selected;
+
+            if (current === questions.length - 1) {
                 showResult();
                 return;
             }
 
             current++;
             showQuestion(current);
-
         }
 
+        function goBack() {
+            if (current > 0) {
+                current--;
+                showQuestion(current);
+            }
+        }
 
+        // showResult, startTimer remain the same (fix typos: percent, PASS/Fail)
 
+        document.getElementById("nextBtn").onclick = checkAndNext;
+        document.getElementById("backBtn").onclick = goBack;
 
-
-
-
-
-
+        start();
     </script>
-    
+
 </body>
+
 </html>
