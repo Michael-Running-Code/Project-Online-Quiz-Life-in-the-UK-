@@ -97,9 +97,17 @@
 
             document.getElementById('quiz').innerHTML = html;
 
-            
+            if (answers[i]) {
+                document.querySelectorAll('input[name="ans"]').forEach(input => {
+                    if (answers[i].includes(parseInt(input.value))) input.chekced = true; 
+                });
+            }
+
+            document.getElementById('nextBtn').style.display = current === 0 ? "none" : "inline-block";
+            document.getElementById('backBtn').textContent = current === 23? "Submit" : "Next" ; 
 
         }
+
 
 
 
