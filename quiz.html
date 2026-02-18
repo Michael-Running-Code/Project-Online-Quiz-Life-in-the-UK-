@@ -44,7 +44,7 @@
         }
 
         #questionArea {
-            max-height: 300px;
+
             overflow: auto;
         }
 
@@ -228,6 +228,30 @@
         document.getElementById("backBtn").onclick = goBack;
         function showResult() {
             let score = 0;
+            let html = '<div class="result">';
+
+            // Final score at the top
+            questions.forEach((q, i) => {
+                const selected = answers[i] || [];
+                const correctIndices = Array.isArray(q.correct)
+                    ? q.correct.map(opt => q.options.indexOf(opt))
+                    : [q.options.indexOf(q.correct)];
+
+                if (selected.length === correctIndices.length && selected.every(v => correctIndices.includes(v))) {
+                    score++;
+                }
+            });
+
+            const percent = Math.round((score / questions.length) * 100);
+            const pass = score >= 18;
+
+            html += `
+    <h2 style="margin:0 0 20px;">Final Score: ${score} / ${questions.length} (${percent}%)</h2>
+    <p style="color:${pass ? 'green' : 'red'}; font-weight:bold; font-size:1.6em; margin:0 0 30px;">
+      ${pass ? "PASS" : "FAIL"}
+    </p>`;
+
+            // Then detailed per-question results
             questions.forEach((q, i) => {
                 const selected = answers[i] || [];
                 const correctIndices = Array.isArray(q.correct)
@@ -236,21 +260,27 @@
 
                 const isCorrect = selected.length === correctIndices.length &&
                     selected.every(v => correctIndices.includes(v));
-                if (isCorrect) score++;
+
+                html += `
+      <div style="margin:20px 0; padding:15px; border:1px solid #ddd; border-radius:8px;">
+        <strong>Question ${i + 1}:</strong> ${q.question}<br><br>
+        <strong>Your answer:</strong> 
+        ${selected.length === 0 ? '<span style="color:#888;">No answer</span>' :
+                        selected.map(idx => q.options[idx]).join(', ')}<br>
+        <strong>Correct answer:</strong> 
+        ${Array.isArray(q.correct) ? q.correct.join(', ') : q.correct}<br>
+        <strong>Status:</strong> 
+        <span style="color:${isCorrect ? 'green' : 'red'}">
+          ${isCorrect ? 'Correct' : 'Incorrect'}
+        </span>
+      </div>`;
             });
 
-            const percent = Math.round((score / questions.length) * 100);
-            const pass = score >= 18;
+            html += `
+    <button onclick="location.reload()" style="margin-top:30px;">Restart Quiz</button>
+  </div>`;
 
-            document.getElementById("questionArea").innerHTML = `
-    <div class="result">
-      <h2>Score: ${score} / ${questions.length} (${percent}%)</h2>
-      <p style="color: ${pass ? 'green' : 'red'}; font-weight:bold;">
-        ${pass ? "PASS" : "FAIL"}
-      </p>
-      <button onclick="location.reload()">Restart Quiz</button>
-    </div>`;
-
+            document.getElementById("questionArea").innerHTML = html;
             document.getElementById("backBtn").style.display = "none";
             document.getElementById("nextBtn").style.display = "none";
             clearInterval(timerInterval);
