@@ -159,7 +159,8 @@
         <strong>Status:</strong> 
         <span style="color:${isCorrect ? 'green' : 'red'}">
           ${isCorrect ? 'Correct' : 'Incorrect'}
-        </span>
+        </span><br>
+        <strong>Explaination:</strong> ${q.explanation}
       </div>`;
             });
 
