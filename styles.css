@@ -64,4 +64,8 @@ h1, p, ul, button {
   text-align: left;          /* ← force left */
 }
 
-
+.flag {
+  width: 120px;
+  margin: 30px auto;
+  display: block;
+}
