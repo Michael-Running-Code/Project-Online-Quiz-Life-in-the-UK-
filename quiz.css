@@ -84,3 +84,9 @@
             /* darker orange border */
             transform: scale(1.15);
         }
+
+        #timer {
+            font-size:20px;
+            font-weight:bold;
+            margin-bottom:20px;
+        }
